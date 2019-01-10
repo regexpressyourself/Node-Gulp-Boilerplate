@@ -1,8 +1,8 @@
-function httpGetAsync(theUrl, callback) { //theURL or a path to file
-  var httpRequest = new XMLHttpRequest();
-  httpRequest.onreadystatechange = function() {
+let httpGetAsync = (theUrl, callback) => { //theURL or a path to file
+  let httpRequest = new XMLHttpRequest();
+  httpRequest.onreadystatechange = () => {
     if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-      var data = httpRequest.responseText; //if you fetch a file you can JSON.parse(httpRequest.responseText)
+      let data = httpRequest.responseText; //if you fetch a file you can JSON.parse(httpRequest.responseText)
       if (callback) {
         callback(data);
       }
@@ -14,11 +14,11 @@ function httpGetAsync(theUrl, callback) { //theURL or a path to file
 }
 
 
-function httpPostAsync(theUrl, payload, callback) { //theURL or a path to file
-  var httpRequest = new XMLHttpRequest();
-  httpRequest.onreadystatechange = function() {
+let httpPostAsync = (theUrl, payload, callback) => { //theURL or a path to file
+  let httpRequest = new XMLHttpRequest();
+  httpRequest.onreadystatechange = () => {
     if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-      var data = httpRequest.responseText; //if you fetch a file you can JSON.parse(httpRequest.responseText)
+      let data = httpRequest.responseText; //if you fetch a file you can JSON.parse(httpRequest.responseText)
       if (callback) {
         callback(data);
       }

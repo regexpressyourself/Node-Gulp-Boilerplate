@@ -1,36 +1,47 @@
-var gulp = require('gulp');
-var sass = require('gulp-sass');
-var minifyCSS = require('gulp-csso');
-var autoprefixer = require('gulp-autoprefixer');
-var cleanCSS = require('gulp-clean-css');
-var concat = require('gulp-concat');
-var sourcemaps = require('gulp-sourcemaps');
-var babel = require('gulp-babel');
-var browserify  = require('browserify');
-var babelify    = require('babelify');
-var source      = require('vinyl-source-stream');
-var buffer      = require('vinyl-buffer');
-var uglify      = require('gulp-uglify');
-var livereload  = require('gulp-livereload');
-var debug = require('gulp-debug');
-var dest = require('gulp-dest');
-var gutil = require('gulp-util');
+const gulp         = require('gulp');
+const sass         = require('gulp-sass');
+const minifyCSS    = require('gulp-csso');
+const autoprefixer = require('gulp-autoprefixer');
+const cleanCSS     = require('gulp-clean-css');
+const concat       = require('gulp-concat');
+const sourcemaps   = require('gulp-sourcemaps');
+const babel        = require('gulp-babel');
+const browserify   = require('browserify');
+const babelify     = require('babelify');
+const source       = require('vinyl-source-stream');
+const buffer       = require('vinyl-buffer');
+const uglify       = require('gulp-uglify');
+const livereload   = require('gulp-livereload');
+const debug        = require('gulp-debug');
+const dest         = require('gulp-dest');
+const gutil        = require('gulp-util');
+const mustache     = require("gulp-mustache");
 
-gulp.task('js', function(){
-  return gulp.src(['public/static/js/services/*.js', 'public/static/js/**/*.js', '!public/static/js/min/*'])
+gulp.task('js', () => {
+  // add in js sources in the order they should be parsed
+  return gulp.src([
+    'public/static/js/external/*.js',
+    'public/static/js/services/*.js',
+    'public/static/js/**/*.js',
+    '!public/static/js/min/*'
+  ])
+  // create sourcemap
     .pipe(sourcemaps.init())
     .pipe(babel({
-      presets: ['@babel/env'
+      presets: [
+        '@babel/env'
       ]
     }))
-    .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
+    .on('error', (err) => {
+      gutil.log(gutil.colors.red('[Error]'), err.toString());
+    })
     .pipe(concat('main.min.js'))
     .pipe(uglify())
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest('public/static/js/min'))
 });
 
-gulp.task('css', function(){
+gulp.task('css', () => {
   return gulp.src('public/static/css/main.scss')
     .pipe(sourcemaps.init())
     .pipe(sass().on('error', sass.logError))
@@ -42,10 +53,19 @@ gulp.task('css', function(){
     .pipe(cleanCSS({compatibility: 'ie11'}))
     .pipe(gulp.dest('public/static/css/min'));
 });
-gulp.task('watch', ['css', 'js'], function () {
-  gulp.watch('public/static/css/**/*.scss', ['css']);
-  gulp.watch('public/static/js/**/*.js', ['js']);
+
+gulp.task('mustache', () => {
+  gulp.src("public/html/pages/*.html")
+    .pipe(mustache({},{},{}))
+    .pipe(gulp.dest("public/html/dist"));
 });
 
 
-gulp.task('default', [ 'css', 'js', 'watch']);
+gulp.task('watch', ['css', 'js', 'mustache'], () => {
+  gulp.watch('public/static/css/**/*.scss', ['css']);
+  gulp.watch('public/static/js/**/*.js', ['js']);
+  gulp.watch('public/html/**/*.{html,mustache}', ['mustache']);
+});
+
+
+gulp.task('default', [ 'css', 'js', 'mustache', 'watch']);
